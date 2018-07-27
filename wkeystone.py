@@ -85,12 +85,18 @@ class Wkeystone():
 		mgr = TokenManager(self.keystone)
 		mgr.validate(token, include_catalog=False, allow_expired=False)
 
+	def tenant_name_to_uuid(self, tname):
+		'''
+		Return the uuid of the FIRST occurrence of the tenant name matched
+		'''
+		for tenant in self.keystone.tenants.list():
+			if(tenant.name == tname):
+				return tenant.id
+
 
 	def tenant_to_name(self, tid):
 		'''
-		
 		Print the name of the provided tenant id
-		
 		'''
 		#return [ name if tid == tenant.name for tenant in self.keystone.tenants.list()]
 		#list(filter(lambda x: x == tid, (self.keystone.tenants.list())))

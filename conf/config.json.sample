@@ -1,0 +1,11 @@
+{
+    "global": {
+        "clientuuid": "A CLIENT UUID GEN",
+        "os_auth_url": "https://keystone_public_endpoint:5000/v2.0",
+        "os_project_name": "DEMO3_LAB",
+        "os_project_id": "YOUR PROJECT ID",
+        "os_auth_token": "TOKEN PASSED TO TEST YOUR CODE",
+        "zaqar_endpoint": "https://zaqar_endpoint:8888"
+    }
+}
+

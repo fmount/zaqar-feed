@@ -24,22 +24,35 @@ import os
 import sys
 import json
 import logging
+import config
 from collections import defaultdict
+from utils import configurator
 from zaqarclient.queues.v1 import client
 
-#logging.basicConfig(filename='/tmp/zaqar.log', level=logging.DEBUGGING)
-
+LOG = logging.getLogger(__name__)
 
 class Zaqar(object):
 	def __init__(self, conf):
-
-		#print(json.dumps(conf, indent=2))
-
-		self.zqc = client.Client('http://10.3.168.102:8888', conf={
+		if conf is not None:
+			self.config = conf
+		'''
+		LOG.debug(self.config.os_auth_url)
+		LOG.debug(self.config.clientuuid)
+		LOG.debug(self.config.os_project_name)
+		LOG.debug(self.config.os_project_id)
+		LOG.debug(self.config.zaqar_endpoint)
+		'''
+		self.zqc = client.Client(self.config.zaqar_endpoint, conf={
 			'auth_opts': {
-				'options': conf
+				'options': self.config.zaqar_conf
 			}
 		}, version=2)
+
+
+	def get_message(self, qname, gr, t):
+		q = self.zqc.queue(qname)
+		claim = q.claim(ttl=t, grace=gr)  # bug #1553387
+		[print(msg.body) for msg in claim]
 
 
 	def send_message(self, qname, msg):
@@ -49,11 +62,9 @@ class Zaqar(object):
 
 
 if __name__ == '__main__':
-	conf = defaultdict()
-	conf.__setitem__('client_uuid', "7288873d-f73a-473b-ae36-96a2246fd61a")
-	conf.__setitem__('os_auth_token', "gAAAAABbKnz_daD2CAXUCk1Vyu8e7LbS-vmX2LQo_v366y22A5mnr-lCGJ3SXGatyJpIprq3Wu6jeTVQ8OEjzR2DiY0bv_dSv-Cc4euTBKc3ZI21FBZM0NmmprgOxrJ8wg8OOLVdOYr9u1Ehbo9WOz47-UW2c0bw86lVTptCKSFZDdbQArVYZ-0")
-	conf.__setitem__('os_auth_url', 'http://10.3.168.24:35357/v3')
-	conf.__setitem__('os_project_id', '78b6573f19884f86a5a6ca607dcf178e')
 
-	zq = Zaqar(conf)
+	c = configurator.Configurator(config)
+
+	zq = Zaqar(conf=c)
 	zq.send_message("foobar", "HELLO ZAQAR >>>")
+	zq.get_message("foobar", 600, 600)
