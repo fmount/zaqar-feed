@@ -28,5 +28,5 @@ from utils.parser import Parser
 LOG = logging.getLogger(__name__)
 
 parameters_json_file_source = {
-	'conf': "conf/config.json",
+	'conf': "../conf/config.json",
 }
